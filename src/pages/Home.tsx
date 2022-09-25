@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 
-function App() {
+function Home() {
    return (
       <div>
          <Span>react</Span>
@@ -12,4 +12,4 @@ const Span = styled.span`
    color: red;
 `;
 
-export default App;
+export default Home;
