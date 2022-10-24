@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from '@emotion/styled';
 
-function Home() {
+function Index() {
    return (
       <div>
          <Span>react</Span>
@@ -13,4 +13,4 @@ const Span = styled.span`
    color: ${({ theme }) => theme.fg.danger};
 `;
 
-export default Home;
+export default Index;

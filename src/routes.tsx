@@ -6,7 +6,7 @@ type ElementType = {
 };
 
 const REQUIRED: Record<string, ElementType> = import.meta.globEager(
-   '/src/pages/(Home|404).tsx',
+   '/src/pages/(404).tsx',
 );
 const ELEMENTS: Record<string, ElementType> = import.meta.globEager(
    '/src/pages/**/[a-z[]*.tsx',
@@ -27,13 +27,12 @@ const elements = Object.keys(ELEMENTS).map((element) => {
 });
 
 export function App() {
-   const Home = requires?.['Home'] || Fragment;
+   // const Index = requires?.['index'] || Fragment;
    const NotFound = requires?.['404'] || Fragment;
 
    return (
       <Routes>
-         <Route path="/" element={<Home />} />
-
+         {/* <Route path="/" element={<Index />} /> */}
          {elements.map(({ path, element: Element }) => (
             <Route key={path} path={path} element={<Element />} />
          ))}
