@@ -1,8 +1,7 @@
 import React from 'react';
-import { Global, css } from '@emotion/react';
-import theme from './theme';
+import { Global, css, Theme } from '@emotion/react';
 
-const styles = css`
+const styles = (theme: Theme) => css`
    *,
    *::after,
    *::before {
@@ -12,7 +11,6 @@ const styles = css`
 
    html,
    body {
-      overflow: hidden;
       height: 100%;
 
       @supports (-webkit-touch-callout: none) {
@@ -24,11 +22,8 @@ const styles = css`
       }
    }
 
-   /* font-family: "Noto Sans KR", sans-serif; */
-   /* font-family: 'Roboto', sans-serif; */
-
    body {
-      color: ${theme.fg.black};
+      color: ${theme.color.black900};
       font-family: 'Noto Sans KR', sans-serif;
       margin: 0;
       position: relative;
@@ -41,8 +36,6 @@ const styles = css`
 
    p,
    h1 {
-      font-size: 1rem;
-      line-height: 1.3;
       padding: 0;
       margin: 0;
    }

@@ -10,7 +10,9 @@ function Index() {
 }
 
 const Span = styled.span`
-   color: ${({ theme }) => theme.fg.danger};
+   color: ${({ theme }) => theme.danger};
+   font-size: ${({ theme }) => theme.font.size.m};
+   font-weight: ${({ theme }) => theme.font.weight.normal};
 `;
 
 export default Index;
