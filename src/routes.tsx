@@ -6,7 +6,7 @@ type ElementType = {
 };
 
 const REQUIRED: Record<string, ElementType> = import.meta.globEager(
-   '/src/pages/(404).tsx',
+   '/src/pages/404.tsx',
 );
 const ELEMENTS: Record<string, ElementType> = import.meta.globEager(
    '/src/pages/**/[a-z[]*.tsx',
