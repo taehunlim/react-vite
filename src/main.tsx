@@ -1,21 +1,22 @@
 import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
 
-import { BrowserRouter } from 'react-router-dom';
+import { RouterProvider } from 'react-router-dom';
 
-import { App } from './routes';
+import { routes } from './routes';
 import EmotionProvider from './assets/EmotionProvider';
 import ErrorBoundary from 'components/ErrorBoundary';
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
    <EmotionProvider>
-      <BrowserRouter>
-         <Suspense fallback={<Loading />}>
-            <ErrorBoundary FallbackComponent={<Error />}>
-               <App />
-            </ErrorBoundary>
-         </Suspense>
-      </BrowserRouter>
+      <Suspense fallback={<Loading />}>
+         <ErrorBoundary FallbackComponent={<Error />}>
+            <RouterProvider
+               router={routes}
+               fallbackElement={<div>Loading...</div>} //
+            />
+         </ErrorBoundary>
+      </Suspense>
    </EmotionProvider>,
 );
 

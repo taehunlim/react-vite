@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { createBrowserRouter, RouteObject } from 'react-router-dom';
 
 type ElementType = {
    [key: string]: () => JSX.Element;
@@ -17,26 +17,21 @@ const requires: ElementType = Object.keys(REQUIRED).reduce((require, file) => {
    return { ...require, [key]: REQUIRED[file].default };
 }, {});
 
-const elements = Object.keys(ELEMENTS).map((element) => {
+const NotFound = requires?.['404'] || Fragment;
+
+const elements: RouteObject[] = Object.keys(ELEMENTS).map((element) => {
    const path = element
       .replace(/\/src\/pages|index|\.tsx$/g, '')
       .replace(/\[\.{3}.+\]/, '*')
       .replace(/\[(.+)\]/, ':$1');
 
-   return { path, element: ELEMENTS[element].default };
+   const Element = ELEMENTS[element].default;
+
+   if (path === '/') {
+      return { path, element: <Element />, errorElement: <NotFound /> };
+   }
+
+   return { path, element: <Element /> };
 });
 
-export function App() {
-   // const Index = requires?.['index'] || Fragment;
-   const NotFound = requires?.['404'] || Fragment;
-
-   return (
-      <Routes>
-         {/* <Route path="/" element={<Index />} /> */}
-         {elements.map(({ path, element: Element }) => (
-            <Route key={path} path={path} element={<Element />} />
-         ))}
-         <Route path="*" element={<NotFound />} />
-      </Routes>
-   );
-}
+export const routes = createBrowserRouter(elements);
