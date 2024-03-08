@@ -14,8 +14,6 @@ const ELEMENTS: Record<string, ElementType> = import.meta.glob(
    { eager: true },
 );
 
-console.log(ELEMENTS);
-
 const requires: ElementType = Object.keys(REQUIRED).reduce((require, file) => {
    const key = file.replace(/\/src\/pages\/|\.tsx$/g, '');
    return { ...require, [key]: REQUIRED[file].default };
@@ -23,19 +21,21 @@ const requires: ElementType = Object.keys(REQUIRED).reduce((require, file) => {
 
 const NotFound = requires?.['404'] || Fragment;
 
-const elements: RouteObject[] = Object.keys(ELEMENTS).map((element) => {
-   const path = element
-      .replace(/\/src\/pages|index|\.tsx$/g, '')
-      .replace(/\[\.{3}.+\]/, '*')
-      .replace(/\[(.+)\]/, ':$1');
+const elements: RouteObject[] = Object.entries(ELEMENTS).map(
+   ([absolutePath, element]) => {
+      const path = absolutePath
+         .replace(/\/src\/pages|index|\.tsx$/g, '')
+         .replace(/\[\.{3}.+\]/, '*')
+         .replace(/\[(.+)\]/, ':$1');
 
-   const Element = ELEMENTS[element].default;
+      const Element = element.default;
 
-   if (path === '/') {
-      return { path, element: <Element />, errorElement: <NotFound /> };
-   }
+      if (path === '/') {
+         return { path, element: <Element />, errorElement: <NotFound /> };
+      }
 
-   return { path, element: <Element /> };
-});
+      return { path, element: <Element /> };
+   },
+);
 
 export const routes = createBrowserRouter(elements);
