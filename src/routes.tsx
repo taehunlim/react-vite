@@ -5,12 +5,16 @@ type ElementType = {
    [key: string]: () => JSX.Element;
 };
 
-const REQUIRED: Record<string, ElementType> = import.meta.globEager(
+const REQUIRED: Record<string, ElementType> = import.meta.glob(
    '/src/pages/404.tsx',
+   { eager: true },
 );
-const ELEMENTS: Record<string, ElementType> = import.meta.globEager(
+const ELEMENTS: Record<string, ElementType> = import.meta.glob(
    '/src/pages/**/[a-z[]*.tsx',
+   { eager: true },
 );
+
+console.log(ELEMENTS);
 
 const requires: ElementType = Object.keys(REQUIRED).reduce((require, file) => {
    const key = file.replace(/\/src\/pages\/|\.tsx$/g, '');
