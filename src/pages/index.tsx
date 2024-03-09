@@ -3,6 +3,8 @@ import styled from '@emotion/styled';
 
 import { deepEqual } from 'utils/deepEqual';
 
+export function Loader() {}
+
 function Index() {
    console.log(deepEqual({}, {}));
    return (

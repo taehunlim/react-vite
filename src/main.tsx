@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 
 import { RouterProvider } from 'react-router-dom';
 
-import { routes } from './routes';
+import { routes, r } from './routes';
 import EmotionProvider from './assets/EmotionProvider';
 import ErrorBoundary from 'components/ErrorBoundary';
 
@@ -12,7 +12,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
       <Suspense fallback={<Loading />}>
          <ErrorBoundary FallbackComponent={<Error />}>
             <RouterProvider
-               router={routes}
+               router={r}
                fallbackElement={<div>Loading...</div>} //
             />
          </ErrorBoundary>

@@ -1,7 +1,7 @@
 import React from 'react';
 
-function HomeDetail() {
+function Detail(props) {
    return <div>detail</div>;
 }
 
-export default HomeDetail;
+export default Detail;
