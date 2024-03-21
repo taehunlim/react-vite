@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { createBrowserRouter, RouteObject } from 'react-router-dom';
+import { RouteObject } from 'react-router-dom';
 
 type ElementType = {
    [key: string]: () => JSX.Element;
@@ -7,11 +7,6 @@ type ElementType = {
 
 const REQUIRED: Record<string, ElementType> = import.meta.glob(
    '/src/pages/404.tsx',
-   { eager: true },
-);
-
-const ROUTES: Record<string, ElementType> = import.meta.glob(
-   '/src/pages/**/[a-z[]*.tsx',
    { eager: true },
 );
 
@@ -29,9 +24,9 @@ const getRelativePath = (path: string) => {
       .replace(/\[([^\]]+)\]/g, ':$1');
 };
 
-export const regularRoutes: RouteObject[] = Object.keys(ROUTES).reduce(
-   (routes, key) => {
-      const Element = ROUTES[key].default;
+export const generateRoutes = (files: Record<string, any>): RouteObject[] => {
+   return Object.keys(files).reduce((routes, key) => {
+      const Element = files[key].default;
 
       const originSegments = key.split('/');
       const folderSegments = originSegments.slice(0, originSegments.length - 1);
@@ -81,7 +76,7 @@ export const regularRoutes: RouteObject[] = Object.keys(ROUTES).reduce(
             );
          }
 
-         const hasLayout = !!ROUTES[layout];
+         const hasLayout = !!files[layout];
          const isLayout = isFile && hasLayout && path === 'layout';
 
          if (isLayout) {
@@ -97,8 +92,5 @@ export const regularRoutes: RouteObject[] = Object.keys(ROUTES).reduce(
       }, {} as RouteObject);
 
       return routes;
-   },
-   [] as RouteObject[],
-);
-
-export const router = createBrowserRouter(regularRoutes);
+   }, [] as RouteObject[]);
+};
