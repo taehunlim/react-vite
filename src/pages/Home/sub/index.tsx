@@ -1,12 +1,7 @@
 import React from 'react';
-import { Outlet } from 'react-router-dom';
 
-function Sub(props) {
-   return (
-      <div>
-         sub <Outlet />
-      </div>
-   );
+function Sub() {
+   return <div>home sub</div>;
 }
 
 export default Sub;

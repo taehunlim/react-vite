@@ -1,6 +1,6 @@
 import React from 'react';
 
-function Bottom(props) {
+function Bottom() {
    return <div>bottom</div>;
 }
 
