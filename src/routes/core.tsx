@@ -28,11 +28,6 @@ export const generateRoutes = (files: Record<string, any>): RouteObject[] => {
    return Object.keys(files).reduce((routes, key) => {
       const Element = files[key].default;
 
-      const originSegments = key.split('/');
-      const folderSegments = originSegments.slice(0, originSegments.length - 1);
-      const folder = folderSegments.join('/');
-      const layout = folder ? `${folder}/layout.tsx` : `/layout.tsx`;
-
       const route: RouteObject = {
          id: key.replace(...patterns.route),
          element: <Element />,
@@ -54,6 +49,7 @@ export const generateRoutes = (files: Record<string, any>): RouteObject[] => {
          const isFile = index === segments.length - 1 && segments.length > 1;
          const isFolder = !isRoot && !isFile;
          const insert = /^\w|\//.test(path) ? 'unshift' : 'push';
+         const layout = segment === 'layout';
 
          if (isRoot) {
             const dynamic = path.startsWith(':') || path === '*';
@@ -83,12 +79,8 @@ export const generateRoutes = (files: Record<string, any>): RouteObject[] => {
             );
          }
 
-         const hasLayout = !!files[layout];
-         const isLayout = isFile && hasLayout && path === 'layout';
-
-         if (isLayout) {
-            parent['element'] = <Element />;
-            parent['id'] = key.replace(...patterns.route);
+         if (layout) {
+            return Object.assign(parent, route);
          } else {
             parent?.children?.[insert]({
                path: path === '/' ? '' : path,
