@@ -1,6 +1,13 @@
 import React, { Fragment } from 'react';
 import { RouteObject } from 'react-router-dom';
 
+const patterns = {
+   route: [/\/src\/pages|\.tsx$/g, ''],
+   splat: [/\[\.{3}\w+\]/g, '*'],
+   param: [/\[([^\]]+)\]/g, ':$1'],
+   slash: [/^index$|\./g, '/'],
+} as const;
+
 type ElementType = {
    [key: string]: () => JSX.Element;
 };
@@ -17,13 +24,6 @@ const requires: ElementType = Object.keys(REQUIRED).reduce((require, file) => {
 
 const NotFound = requires?.['404'] || Fragment;
 
-const getRelativePath = (path: string) => {
-   return path
-      .replace(/\/src\/pages|\.tsx$/g, '')
-      .replace(/\[\.{3}.+\]/, '*')
-      .replace(/\[([^\]]+)\]/g, ':$1');
-};
-
 export const generateRoutes = (files: Record<string, any>): RouteObject[] => {
    return Object.keys(files).reduce((routes, key) => {
       const Element = files[key].default;
@@ -34,15 +34,22 @@ export const generateRoutes = (files: Record<string, any>): RouteObject[] => {
       const layout = folder ? `${folder}/layout.tsx` : `/layout.tsx`;
 
       const route: RouteObject = {
+         id: key.replace(...patterns.route),
          element: <Element />,
          errorElement:
             key === '/src/pages/index.tsx' ? <NotFound /> : undefined,
       };
 
-      const segments = getRelativePath(key).split('/').filter(Boolean);
+      const segments = key
+         .replace(...patterns.route)
+         .replace(...patterns.splat)
+         .replace(...patterns.param)
+         .split('/')
+         .filter(Boolean);
 
       segments.reduce((parent, segment, index) => {
-         const path = segment.replace(/index|\./g, '/');
+         const path = segment.replace(...patterns.slash);
+
          const isRoot = index === 0;
          const isFile = index === segments.length - 1 && segments.length > 1;
          const isFolder = !isRoot && !isFile;
@@ -81,6 +88,7 @@ export const generateRoutes = (files: Record<string, any>): RouteObject[] => {
 
          if (isLayout) {
             parent['element'] = <Element />;
+            parent['id'] = key.replace(...patterns.route);
          } else {
             parent?.children?.[insert]({
                path: path === '/' ? '' : path,

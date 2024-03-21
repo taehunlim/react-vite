@@ -12,4 +12,5 @@ const ROUTES: Record<string, ElementType> = import.meta.glob(
 
 export const routes: RouteObject[] = generateRoutes(ROUTES);
 
+console.log(routes);
 export const router = createBrowserRouter(routes);
