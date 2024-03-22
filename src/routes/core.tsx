@@ -17,6 +17,8 @@ export type Module = {
    Pending?: Element;
 };
 
+type PreservedKey = '_app' | '404';
+
 const generateRouteObject = (
    files: Record<string, Partial<Element>>,
    key: string,
@@ -42,6 +44,16 @@ const generateRouteObject = (
       loader: module?.Loader,
       action: module?.Action,
    };
+};
+
+export const generatePreservedRoutes = (
+   files: Record<string, Partial<Element>>,
+): Partial<Record<PreservedKey, Omit<Module, 'Action'>>> => {
+   return Object.keys(files).reduce((routes, key) => {
+      const path = key.replace(...patterns.route);
+
+      return { ...routes, [path]: files[key] };
+   }, {});
 };
 
 export const generateRoutes = (
