@@ -2,7 +2,7 @@ import React, { Fragment, Suspense } from 'react';
 import { ActionFunction, LoaderFunction, RouteObject } from 'react-router-dom';
 
 const patterns = {
-   route: [/\/src\/pages|\.tsx$/g, ''],
+   route: [/\/src\/pages\/|\.tsx$/g, ''],
    splat: [/\[\.{3}\w+\]/g, '*'],
    param: [/\[([^\]]+)\]/g, ':$1'],
    slash: [/^index$|\./g, '/'],
@@ -54,8 +54,7 @@ export const generateRoutes = (
          .replace(...patterns.route)
          .replace(...patterns.splat)
          .replace(...patterns.param)
-         .split('/')
-         .filter(Boolean);
+         .split('/');
 
       segments.reduce((parent, segment, index) => {
          const path = segment.replace(...patterns.slash);
