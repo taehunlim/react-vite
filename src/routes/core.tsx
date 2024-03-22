@@ -1,5 +1,5 @@
-import React, { Fragment } from 'react';
-import { RouteObject } from 'react-router-dom';
+import React, { Fragment, Suspense } from 'react';
+import { ActionFunction, LoaderFunction, RouteObject } from 'react-router-dom';
 
 const patterns = {
    route: [/\/src\/pages|\.tsx$/g, ''],
@@ -8,32 +8,47 @@ const patterns = {
    slash: [/^index$|\./g, '/'],
 } as const;
 
-type ElementType = {
-   [key: string]: () => JSX.Element;
+type Element = () => JSX.Element;
+export type Module = {
+   default: Element;
+   Loader?: LoaderFunction;
+   Action?: ActionFunction;
+   Catch?: Element;
+   Pending?: Element;
 };
 
-const REQUIRED: Record<string, ElementType> = import.meta.glob(
-   '/src/pages/404.tsx',
-   { eager: true },
-);
+const generateRouteObject = (
+   files: Record<string, Partial<Element>>,
+   key: string,
+): RouteObject => {
+   const module: Partial<Module> = files[key];
+   const index =
+      /index\.tsx$/.test(key) && !key.includes('pages/index')
+         ? { index: true }
+         : {};
 
-const requires: ElementType = Object.keys(REQUIRED).reduce((require, file) => {
-   const key = file.replace(/\/src\/pages\/|\.tsx$/g, '');
-   return { ...require, [key]: REQUIRED[file].default };
-}, {});
+   const Element = module?.default || Fragment;
+   const Page = () =>
+      module?.Pending ? (
+         <Suspense fallback={<module.Pending />} children={<Element />} />
+      ) : (
+         <Element />
+      );
+   return {
+      ...index,
+      id: key.replace(...patterns.route),
+      element: <Page />,
+      // ErrorBoundary: module?.Catch,
+      loader: module?.Loader,
+      action: module?.Action,
+   };
+};
 
-const NotFound = requires?.['404'] || Fragment;
-
-export const generateRoutes = (files: Record<string, any>): RouteObject[] => {
+export const generateRoutes = (
+   files: Record<string, Partial<Module>>,
+): RouteObject[] => {
    return Object.keys(files).reduce((routes, key) => {
-      const Element = files[key].default;
-
-      const route: RouteObject = {
-         id: key.replace(...patterns.route),
-         element: <Element />,
-         errorElement:
-            key === '/src/pages/index.tsx' ? <NotFound /> : undefined,
-      };
+      const route = generateRouteObject(files, key);
 
       const segments = key
          .replace(...patterns.route)
