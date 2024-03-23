@@ -36,11 +36,12 @@ const generateRouteObject = (
       ) : (
          <Element />
       );
+
    return {
       ...index,
       id: key.replace(...patterns.route),
       element: <Page />,
-      // ErrorBoundary: module?.Catch,
+      errorElement: module?.Catch ? <module.Catch /> : undefined,
       loader: module?.Loader,
       action: module?.Action,
    };

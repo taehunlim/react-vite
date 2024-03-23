@@ -17,10 +17,11 @@ export const routes = generateRoutes(ROUTES);
 const _app = preservedRoutes?.['_app'];
 const App = _app?.default || Outlet;
 const NotFound = preservedRoutes?.['404']?.default || Fragment;
+const ErrorBoundary = _app?.Catch || NotFound;
 
 const app = {
    element: <App />,
-   // ErrorBoundary: _app?.Catch,
+   errorElement: <ErrorBoundary />,
    loader: _app?.Loader,
 };
 const fallback = { path: '*', element: <NotFound /> };
