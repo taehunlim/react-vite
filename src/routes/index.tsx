@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router-dom';
+import { Outlet, createBrowserRouter } from 'react-router-dom';
 
 import { Module, generatePreservedRoutes, generateRoutes } from './core';
 import { Fragment } from 'react';
@@ -14,9 +14,19 @@ const ROUTES = import.meta.glob<Module>('/src/pages/**/[a-z[]*.tsx', {
 export const preservedRoutes = generatePreservedRoutes(PRESERVED);
 export const routes = generateRoutes(ROUTES);
 
+const _app = preservedRoutes?.['_app'];
+const App = _app?.default || Outlet;
 const NotFound = preservedRoutes?.['404']?.default || Fragment;
+
+const app = {
+   element: <App />,
+   // ErrorBoundary: _app?.Catch,
+   loader: _app?.Loader,
+};
 const fallback = { path: '*', element: <NotFound /> };
 
-export const router = createBrowserRouter([...routes, fallback]);
+export const router = createBrowserRouter([
+   { ...app, children: [...routes, fallback] },
+]);
 
 console.log(routes);
