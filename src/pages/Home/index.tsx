@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import { lazy, useState } from 'react';
 // import { useRouteError, isRouteErrorResponse, json } from 'react-router-dom';
-const SlowTab = React.lazy(() => import('components/SlowTab'));
+const SlowTab = lazy(() => import('components/SlowTab'));
 
 // export const Loader = async () => {
 //    // return true;

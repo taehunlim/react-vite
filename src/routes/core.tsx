@@ -1,4 +1,4 @@
-import React, { Fragment, Suspense } from 'react';
+import { Fragment, Suspense } from 'react';
 import { ActionFunction, LoaderFunction, RouteObject } from 'react-router-dom';
 
 const patterns = {
