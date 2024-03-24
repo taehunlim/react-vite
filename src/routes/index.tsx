@@ -29,5 +29,3 @@ const fallback = { path: '*', element: <NotFound /> };
 export const router = createBrowserRouter([
    { ...app, children: [...routes, fallback] },
 ]);
-
-console.log(routes);

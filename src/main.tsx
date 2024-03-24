@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+import { Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
 
 import { RouterProvider } from 'react-router-dom';
@@ -13,7 +13,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
          <ErrorBoundary FallbackComponent={<Error />}>
             <RouterProvider
                router={router}
-               fallbackElement={<div>Loading...</div>} //
+               fallbackElement={<div>loader Loading...</div>} //
             />
          </ErrorBoundary>
       </Suspense>
@@ -25,5 +25,5 @@ function Error() {
 }
 
 function Loading() {
-   return <h1 style={{ color: 'black' }}>Loading...</h1>;
+   return <h1 style={{ color: 'black' }}>App Loading...</h1>;
 }
