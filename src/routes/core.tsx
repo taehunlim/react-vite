@@ -20,7 +20,7 @@ export type Module = {
 type PreservedKey = '_app' | '404';
 
 const generateRouteObject = (
-   files: Record<string, Partial<Element>>,
+   files: Record<string, Partial<Module>>,
    key: string,
 ): RouteObject => {
    const module: Partial<Module> = files[key];
