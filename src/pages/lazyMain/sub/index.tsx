@@ -1,5 +1,5 @@
 function LazySub() {
-   return <div>main sub</div>;
+   return <div>LazySub</div>;
 }
 
 export default LazySub;

@@ -29,6 +29,11 @@ const generateLazyRouteObject = (
          ? { index: true }
          : {};
 
+   const path = key.replace(...patterns.route);
+   const isLazy = path.split('/').some((p) => p.indexOf('lazy') === 0);
+
+   console.log(path, isLazy);
+
    return {
       ...index,
       id: key.replace(...patterns.route),
