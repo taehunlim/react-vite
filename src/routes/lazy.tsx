@@ -6,6 +6,7 @@ const patterns = {
    splat: [/\[\.{3}\w+\]/g, '*'],
    param: [/\[([^\]]+)\]/g, ':$1'],
    slash: [/^index$|\./g, '/'],
+   lazy: [/lazy(\w+)/g, '$1'],
 } as const;
 
 type Element = () => JSX.Element;
@@ -71,21 +72,25 @@ export const generateLazyRoutes = (files: LazyFiles): RouteObject[] => {
 
       segments.reduce((parent, segment, index) => {
          const path = segment.replace(...patterns.slash);
+         const removedLazyPath = path
+            .replace(...patterns.lazy)
+            .toLocaleLowerCase();
 
          const isRoot = index === 0;
          const isFile = index === segments.length - 1 && segments.length > 1;
          const isFolder = !isRoot && !isFile;
-         const insert = /^\w|\//.test(path) ? 'unshift' : 'push';
+         const insert = /^\w|\//.test(removedLazyPath) ? 'unshift' : 'push';
          const layout = segment === 'layout';
 
          if (isRoot) {
-            const dynamic = path.startsWith(':') || path === '*';
+            const dynamic =
+               removedLazyPath.startsWith(':') || removedLazyPath === '*';
             if (dynamic) return parent;
 
             const file = segments.length === 1;
 
             if (file) {
-               routes.push({ path, ...route });
+               routes.push({ path: removedLazyPath, ...route });
                return parent;
             }
          }
@@ -93,11 +98,12 @@ export const generateLazyRoutes = (files: LazyFiles): RouteObject[] => {
          if (isRoot || isFolder) {
             const routeObjects = isRoot ? routes : parent.children;
             const routeObject = routeObjects?.find(
-               (route) => route.path === path,
+               (route) => route.path === removedLazyPath,
             );
 
             if (routeObject) routeObject.children ??= [];
-            else routeObjects?.[insert]({ path, children: [] });
+            else
+               routeObjects?.[insert]({ path: removedLazyPath, children: [] });
             return (
                routeObject ||
                routeObjects?.[
@@ -110,7 +116,7 @@ export const generateLazyRoutes = (files: LazyFiles): RouteObject[] => {
             return Object.assign(parent, route);
          } else {
             parent?.children?.[insert]({
-               path: path === '/' ? '' : path,
+               path: removedLazyPath === '/' ? '' : removedLazyPath,
                ...route,
             });
          }
