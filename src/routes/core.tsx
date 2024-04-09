@@ -18,34 +18,36 @@ export type Module = {
 };
 
 type PreservedKey = '_app' | '404';
+type Files = Partial<Module>;
+type LazyFiles = () => Promise<Partial<Module>>;
 
-const generateRouteObject = (
-   files: Record<string, Partial<Module>>,
-   key: string,
-): RouteObject => {
-   const module: Partial<Module> = files[key];
-   const index =
-      /index\.tsx$/.test(key) && !key.includes('pages/index')
-         ? { index: true }
-         : {};
+// const generateRouteObject = (
+//    files: Record<string, Partial<Module>>,
+//    key: string,
+// ): RouteObject => {
+//    const module: Partial<Module> = files[key];
+//    const index =
+//       /index\.tsx$/.test(key) && !key.includes('pages/index')
+//          ? { index: true }
+//          : {};
 
-   const Element = module?.default || Fragment;
-   const Page = () =>
-      module?.Pending ? (
-         <Suspense fallback={<module.Pending />} children={<Element />} />
-      ) : (
-         <Element />
-      );
+//    const Element = module?.default || Fragment;
+//    const Page = () =>
+//       module?.Pending ? (
+//          <Suspense fallback={<module.Pending />} children={<Element />} />
+//       ) : (
+//          <Element />
+//       );
 
-   return {
-      ...index,
-      id: key.replace(...patterns.route),
-      element: <Page />,
-      errorElement: module?.Catch ? <module.Catch /> : undefined,
-      loader: module?.Loader,
-      action: module?.Action,
-   };
-};
+//    return {
+//       ...index,
+//       id: key.replace(...patterns.route),
+//       element: <Page />,
+//       errorElement: module?.Catch ? <module.Catch /> : undefined,
+//       loader: module?.Loader,
+//       action: module?.Action,
+//    };
+// };
 
 export const generatePreservedRoutes = (
    files: Record<string, Partial<Element>>,
@@ -57,9 +59,65 @@ export const generatePreservedRoutes = (
    }, {});
 };
 
-export const generateRoutes = (
-   files: Record<string, Partial<Module>>,
-): RouteObject[] => {
+export function generateRouteObject(files: LazyFiles, key: string): RouteObject;
+export function generateRouteObject(files: Files, key: string): RouteObject;
+export function generateRouteObject(files: any, key: string): RouteObject {
+   const module = files[key];
+   const index =
+      /index\.tsx$/.test(key) && !key.includes('pages/index')
+         ? { index: true }
+         : {};
+
+   const isLazy = /lazy_.+\.tsx$/.test(key);
+
+   if (isLazy) {
+      return {
+         ...index,
+         id: key.replace(...patterns.route),
+         lazy: async () => {
+            const lazyModule = await module();
+
+            const Element = lazyModule?.default || Fragment;
+            const Pending = lazyModule?.Pending;
+            const ErrorElement = lazyModule?.Catch;
+            const Page = () =>
+               Pending ? (
+                  <Suspense fallback={<Pending />} children={<Element />} />
+               ) : (
+                  <Element />
+               );
+
+            return {
+               Component: Page,
+               errorElement: ErrorElement ? <ErrorElement /> : undefined,
+               loader: lazyModule?.Loader,
+               action: lazyModule?.Action,
+            };
+         },
+      };
+   } else {
+      const Element = module?.default || Fragment;
+      const Page = () =>
+         module?.Pending ? (
+            <Suspense fallback={<module.Pending />} children={<Element />} />
+         ) : (
+            <Element />
+         );
+
+      return {
+         ...index,
+         id: key.replace(...patterns.route),
+         element: <Page />,
+         errorElement: module?.Catch ? <module.Catch /> : undefined,
+         loader: module?.Loader,
+         action: module?.Action,
+      };
+   }
+}
+
+export function generateRoutes(files: Files): RouteObject[];
+export function generateRoutes(files: LazyFiles): RouteObject[];
+export function generateRoutes(files: any): RouteObject[] {
    return Object.keys(files).reduce((routes, key) => {
       const route = generateRouteObject(files, key);
 
@@ -120,4 +178,4 @@ export const generateRoutes = (
 
       return routes;
    }, [] as RouteObject[]);
-};
+}

@@ -1,8 +1,7 @@
 import { Fragment } from 'react';
 import { Outlet, createBrowserRouter } from 'react-router-dom';
 
-import { Module, generatePreservedRoutes } from './core';
-import { generateLazyRoutes } from './lazy';
+import { Module, generatePreservedRoutes, generateRoutes } from './core';
 
 // react-router-dom lazy
 // 기존 createBrowserRouter만을 이용해서 라우터 구성시 Component는 무조건 export default function가 아닌 export function 으로 작성해야함
@@ -10,14 +9,17 @@ import { generateLazyRoutes } from './lazy';
 const PRESERVED = import.meta.glob<Module>('/src/pages/(_app|404).tsx', {
    eager: true,
 });
-// const ROUTES = import.meta.glob<Module>('/src/pages/**/[a-z[]*.tsx', {
-//    eager: true,
-// });
-const LAZY_ROUTES = import.meta.glob<Module>('/src/pages/**/[a-z[]*.tsx');
+const ROUTES = import.meta.glob<Module>(
+   ['/src/pages/**/[a-z[]*.tsx', '!/**/(lazy_)[a-z[]*.tsx'],
+   {
+      eager: true,
+   },
+);
 
-export const preservedRoutes = generatePreservedRoutes(PRESERVED);
-// export const routes = generateRoutes(ROUTES);
-export const lazyRoutes = generateLazyRoutes(LAZY_ROUTES);
+const LAZY_ROUTES = import.meta.glob<Module>('/src/pages/**/(lazy_)*');
+
+const preservedRoutes = generatePreservedRoutes(PRESERVED);
+const routes = generateRoutes({ ...ROUTES, ...LAZY_ROUTES });
 
 const _app = preservedRoutes?.['_app'];
 const App = _app?.default || Outlet;
@@ -34,6 +36,6 @@ const fallback = { path: '*', element: <NotFound /> };
 export const router = createBrowserRouter([
    {
       ...app,
-      children: [...lazyRoutes, fallback],
+      children: [...routes, fallback],
    },
 ]);
