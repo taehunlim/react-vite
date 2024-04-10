@@ -15,7 +15,6 @@ const ROUTES = import.meta.glob<Module>(
       eager: true,
    },
 );
-
 const LAZY_ROUTES = import.meta.glob<Module>('/src/pages/**/(lazy_)*');
 
 const preservedRoutes = generatePreservedRoutes(PRESERVED);
