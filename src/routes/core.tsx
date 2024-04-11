@@ -6,6 +6,7 @@ const patterns = {
    splat: [/\[\.{3}\w+\]/g, '*'],
    param: [/\[([^\]]+)\]/g, ':$1'],
    slash: [/^index$|\./g, '/'],
+   lazy: [/lazy_+/g, ''],
 } as const;
 
 type Element = () => JSX.Element;
@@ -60,8 +61,6 @@ export const generateLazyRouteObject = (
    module: LazyModule,
    key: string,
 ): RouteObject => {
-   // const module = files[key];
-
    const index =
       /index\.tsx$/.test(key) && !key.includes('pages/index')
          ? { index: true }
@@ -115,7 +114,9 @@ export function generateRoutes(files: any): RouteObject[] {
          .split('/');
 
       segments.reduce((parent, segment, index) => {
-         const path = segment.replace(...patterns.slash);
+         const path = segment
+            .replace(...patterns.lazy)
+            .replace(...patterns.slash);
 
          const isRoot = index === 0;
          const isFile = index === segments.length - 1 && segments.length > 1;
