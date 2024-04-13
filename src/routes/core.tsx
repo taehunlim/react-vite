@@ -57,6 +57,7 @@ export const generateRouteObject = (
       action: module?.Action,
    };
 };
+
 export const generateLazyRouteObject = (
    module: LazyModule,
    key: string,
@@ -102,6 +103,15 @@ export function generateRoutes(files: any): RouteObject[] {
    return Object.keys(files).reduce((routes, key) => {
       const isLazy = /lazy_.+\.tsx$/.test(key);
       const module = files[key];
+
+      if (isLazy) {
+         const routePath = key.replace(...patterns.lazy);
+         if (files[routePath]) {
+            throw new Error(
+               `001: The router with path=${routePath} conflict with the lazy router with path=${key}`,
+            );
+         }
+      }
 
       const route = isLazy
          ? generateLazyRouteObject(module, key)
